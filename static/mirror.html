@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blue Depth Ocean Research Institute</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="topbar">
+    <div class="brand"><span class="wave">🌊</span> Blue Depth Ocean Research Institute</div>
+    <nav id="nav"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <h1>Twelve years of deep-sea survey data, open to researchers.</h1>
+      <p>Blue Depth maintains the largest public registry of hydrothermal-vent and abyssal-plain
+      findings in the North Pacific. Browse published findings or query the registry directly
+      through our research API.</p>
+    </div>
+    <div class="grid" style="margin-top:20px;">
+      <div class="card neu"><div class="stat">3,940</div><div class="label">Catalogued Specimens</div></div>
+      <div class="card neu"><div class="stat">22</div><div class="label">Active Expeditions</div></div>
+      <div class="card neu"><div class="stat">184</div><div class="label">Published Findings</div></div>
+      <div class="card neu"><div class="stat">7</div><div class="label">Research Vessels</div></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-db">
+    <h2>Ocean Sample Registry</h2>
+    <p class="small">Public findings from our most recent survey (Expedition Meridian-6, East Pacific Rise).</p>
+    <div class="card neu"><table id="sampleTable"><thead>
+      <tr><th>Specimen ID</th><th>Species</th><th>Depth (m)</th><th>Site</th><th>Status</th></tr>
+    </thead><tbody></tbody></table></div>
+
+    <h3 style="margin-top:26px;">Research API</h3>
+    <p class="small">Programmatic access to the registry. Every request below is live.</p>
+    <div class="card neu" id="endpointList"></div>
+  </section>
+
+</main>
+
+<footer>Blue Depth Ocean Research Institute</footer>
+
+<script>
+(function () {
+  const views = ["home", "db"];
+  const labels = { home: "Home", db: "Research Database" };
+  const nav = document.getElementById("nav");
+  views.forEach((v) => {
+    const b = document.createElement("button");
+    b.textContent = labels[v];
+    if (v === "home") b.className = "active";
+    b.onclick = () => {
+      views.forEach((x) => document.getElementById("view-" + x).classList.toggle("active", x === v));
+      [...nav.children].forEach((btn, i) => btn.classList.toggle("active", views[i] === v));
+    };
+    nav.appendChild(b);
+  });
+
+  fetch("/mirror/api/samples").then((r) => r.json()).then((d) => {
+    const tbody = document.querySelector("#sampleTable tbody");
+    d.samples.forEach((s) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${s.id}</td><td>${s.species}</td><td>${s.depth_m}</td><td>${s.site}</td><td>${s.status}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+
+  const endpoints = [
+    { path: "/mirror/api/species", desc: "Published species list" },
+    { path: "/mirror/api/expeditions", desc: "Expedition logs" },
+    { path: "/mirror/api/samples", desc: "Full specimen registry" },
+    { path: "/mirror/api/samples/search?q=magnifica", desc: "Search the registry" },
+  ];
+  const epList = document.getElementById("endpointList");
+  endpoints.forEach((ep) => {
+    const row = document.createElement("div");
+    row.className = "endpoint-row";
+    row.innerHTML = `<div><div class="epath">GET ${ep.path}</div><div class="esub">${ep.desc}</div></div>
+      <button class="btn ghost">Try it</button>`;
+    epList.appendChild(row);
+    const pre = document.createElement("pre");
+    pre.className = "resp";
+    pre.style.display = "none";
+    epList.appendChild(pre);
+    row.querySelector("button").onclick = async () => {
+      const res = await fetch(ep.path);
+      const json = await res.json();
+      pre.style.display = "block";
+      pre.textContent = `GET ${ep.path} → ${res.status}\n\n` + JSON.stringify(json, null, 2);
+    };
+  });
+})();
+</script>
+</body>
+</html>
