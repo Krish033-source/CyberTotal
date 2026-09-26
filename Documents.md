@@ -358,14 +358,7 @@ For the full architecture, workflows, engine descriptions, feature
 blueprint, and proposed MVP, refer to the project documentation PDF
 included with the project.
 
+Drive Link: https://drive.google.com/file/d/1AQwhQ5ZS1R5p2UnEBOQWqr5Piu7HU6Uf/view?usp=drive_link
+
 ------------------------------------------------------------------------
 
-```{=html}
-<p align="center">
-```
-`<strong>`{=html}CyberTotal`</strong>`{=html}`<br />`{=html}
-`<em>`{=html}Don't predict the attack. Let it reveal
-itself.`</em>`{=html}
-```{=html}
-</p>
-```
